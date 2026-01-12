@@ -1,6 +1,5 @@
 package com.miriki.ti99.mame.domain;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -83,6 +82,7 @@ public abstract class MediaEntryList<T extends MediaEntry> {
      * @return the full path, or {@code null} if not found or invalid
      */
     public Path resolveMediaPath(String displayName) {
+    	// log.trace( "resolveMediaPath( displayName='{}' )", displayName );
         if (displayName == null
                 || displayName.isBlank()
                 || UiConstants.CBX_SEL_NONE.equals(displayName)) {
@@ -90,7 +90,19 @@ public abstract class MediaEntryList<T extends MediaEntry> {
         }
 
         T entry = findByDisplayName(displayName);
-        return entry != null ? entry.getFullPath() : null;
+        if (entry == null) {
+            return null;
+        }
+
+        // FIAD-Sonderfall: Alias "name.fiad" → Ordner "name"
+        if (displayName.toLowerCase().endsWith(".fiad")) {
+        	// log.trace( ".fiad detected, returning: '{}'", entry.getMediaPath().resolve(entry.getMediaName()) );
+            return entry.getMediaPath().resolve(entry.getMediaName());
+        }
+
+        // Normale Medien
+    	// log.trace( "normal file, returning: '{}'", entry.getFullPath() );
+        return entry.getFullPath();
     }
 
     /**
@@ -108,31 +120,19 @@ public abstract class MediaEntryList<T extends MediaEntry> {
         if (UiConstants.CBX_SEL_NONE.equals(displayName))
             return null;
 
-        // Entry anhand des Display-Namens finden
         MediaEntry entry = findByDisplayName(displayName);
         if (entry == null)
             return null;
 
-        // Absoluten Pfad des Mediums bestimmen
-        Path full = entry.getFullPath();
+        Path full;
 
-        // FIAD: Verzeichnis statt Datei
-        if (!Files.exists(full)) {
-            // Prüfen, ob es ein Verzeichnis ohne Extension ist
-            Path fiadDir = entry.getMediaPath().resolve(entry.getMediaName());
-            if (Files.isDirectory(fiadDir)) {
-                try {
-                    return workingDir.relativize(fiadDir);
-                } catch (IllegalArgumentException ex) {
-                    return fiadDir;
-                }
-            }
-
-            // Weder Datei noch FIAD-Verzeichnis gefunden
-            return null;
+        // FIAD-Sonderfall: Ordner statt Datei
+        if (displayName.toLowerCase().endsWith(".fiad")) {
+            full = entry.getMediaPath().resolve(entry.getMediaName());
+        } else {
+            full = entry.getFullPath();
         }
 
-        // Normale Datei → relativieren
         try {
             return workingDir.relativize(full);
         } catch (IllegalArgumentException ex) {

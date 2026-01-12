@@ -91,9 +91,10 @@ public class MainAppFrameState {
         }
 
         // log.trace("  looking for '{}' in list.findByDisplayName(displayName) ...", displayName);
-        MediaEntry entry = list.findByDisplayName(displayName);
+        // MediaEntry entry = list.findByDisplayName(displayName);
 
-        return entry != null ? entry.getFullPath() : null;
+        return list.resolveMediaPath(displayName);
+        // return entry != null ? entry.getFullPath() : null;
     }
 
     // -------------------------------------------------------------------------

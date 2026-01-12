@@ -2,14 +2,22 @@ package com.miriki.ti99.mame.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.miriki.ti99.imagetools.domain.DiskFormat;
+import com.miriki.ti99.imagetools.domain.DiskFormatPreset;
+import com.miriki.ti99.imagetools.domain.Ti99File;
+import com.miriki.ti99.imagetools.domain.Ti99Image;
+import com.miriki.ti99.imagetools.domain.io.ImageFormatter;
+import com.miriki.ti99.imagetools.fs.FileImporter;
 import com.miriki.ti99.mame.dto.EmulatorOptionsDTO;
 import com.miriki.ti99.mame.ui.UiConstants;
 
@@ -286,21 +294,21 @@ public class EmulatorStart {
         }
 
         // log.trace( "  calling appendMedia with 'sb', '-flop1' and dto.fddPathRel1='{}'", dto.fddPathRel1 );
-        appendMedia(sb, "-flop1", dto.fddPathRel1);
-        appendMedia(sb, "-flop2", dto.fddPathRel2);
-        appendMedia(sb, "-flop3", dto.fddPathRel3);
-        appendMedia(sb, "-flop4", dto.fddPathRel4);
+        appendMedia(sb, "-flop1", dto.fddPathP1, dto.fddPathRel1);
+        appendMedia(sb, "-flop2", dto.fddPathP2, dto.fddPathRel2);
+        appendMedia(sb, "-flop3", dto.fddPathP3, dto.fddPathRel3);
+        appendMedia(sb, "-flop4", dto.fddPathP4, dto.fddPathRel4);
 
-        appendMedia(sb, "-hard1", dto.hddPathRel1);
-        appendMedia(sb, "-hard2", dto.hddPathRel2);
-        appendMedia(sb, "-hard3", dto.hddPathRel3);
+        appendMedia(sb, "-hard1", dto.hddPathP1, dto.hddPathRel1);
+        appendMedia(sb, "-hard2", dto.hddPathP2, dto.hddPathRel2);
+        appendMedia(sb, "-hard3", dto.hddPathP3, dto.hddPathRel3);
 
         if ("geneve".equals(dto.mame_Machine) || "genmod".equals(dto.mame_Machine)) {
             log.warn("selected 'Cassette' is ignored due to incompatibility with machine '{}'",
                     dto.mame_Machine);
         } else {
-            appendMedia(sb, "-cass1", dto.cassPathRel1);
-            appendMedia(sb, "-cass2", dto.cassPathRel2);
+            appendMedia(sb, "-cass1", dto.cassPathP1, dto.cassPathRel1);
+            appendMedia(sb, "-cass2", dto.cassPathP2, dto.cassPathRel2);
         }
 
         String result = sb.toString();
@@ -317,16 +325,104 @@ public class EmulatorStart {
     // Media helper
     // -------------------------------------------------------------------------
 
-    private static void appendMedia(StringBuilder sb, String option, Path fullPath) {
-        // log.trace( "    appendMedia( {}, {}, {} )", sb.toString(), option, fullPath );
-        if (fullPath == null) return;
-        sb.append(" ").append(option).append(" ").append(fullPath);
-        // log.trace( "      added to sb: '{} {}'", option, fullPath );
+    // -------------------------------------------------------------
+    // FIAD → DSK Parameterauflösung
+    // -------------------------------------------------------------
+    
+    private static void appendMedia(StringBuilder sb, String option, Path absPath, Path relPath) {
+        if (absPath == null || relPath == null) {
+            // log.trace("appendMedia: skipped '{}': absPath or relPath is null", option);
+            return;
+        }
+
+        // log.trace("appendMedia: absPath='{}', relPath='{}'", absPath, relPath);
+        // log.trace("appendMedia: isDirectory(absPath) = {}", Files.isDirectory(absPath));
+        String param;
+
+        if (Files.isDirectory(absPath)) {
+            String name = relPath.getFileName().toString();
+            Path parent = relPath.getParent();
+            param = parent != null
+                ? parent.resolve(name + ".dsk").toString()
+                : name + ".dsk";
+            // log.trace("[directory] param: '{}'", param);
+        } else {
+            param = relPath.toString();
+            // log.trace("[file] param: '{}'", param);
+        }
+
+        sb.append(" ").append(option).append(" ").append(param);
     }
 
     // -------------------------------------------------------------------------
     // Process execution
     // -------------------------------------------------------------------------
+
+    private static Path createDskFromFiad(Path fiadDir) throws IOException {
+
+        // Ziel: <fiadDir>.dsk
+        Path dskPath = fiadDir.resolveSibling(fiadDir.getFileName().toString() + ".dsk");
+
+        // 1. Diskettenformat wählen (erstmal DSDD – später konfigurierbar)
+        DiskFormatPreset preset = DiskFormatPreset.TI_DSDD;
+        DiskFormat format = preset.getFormat();
+
+        // 2. Neues Image erzeugen
+        Ti99Image image = new Ti99Image(format);
+        ImageFormatter.initialize(image);
+
+        // 3. Alle Dateien im FIAD-Ordner importieren
+        try (Stream<Path> stream = Files.list(fiadDir)) {
+            stream
+                .filter(Files::isRegularFile)
+                .forEach(file -> {
+                    try {
+                        importAsProgram(image, file);
+                    } catch (Exception ex) {
+                        log.warn("Konnte Datei nicht importieren: {}", file, ex);
+                    }
+                });
+        }
+
+        // 4. Image speichern
+        Files.write(dskPath, image.getRawData());
+
+        log.trace("FIAD → DSK erzeugt: {}", dskPath);
+        return dskPath;
+    }
+
+    private static void importAsProgram(Ti99Image image, Path hostFile) throws Exception {
+
+        byte[] content = Files.readAllBytes(hostFile);
+
+        Ti99File tiFile = new Ti99File();
+
+        // TI-Dateiname: maximal 10 Zeichen, keine Punkte
+        String baseName = hostFile.getFileName().toString();
+        baseName = baseName.replaceAll("\\..*$", ""); // Extension entfernen
+        baseName = baseName.toUpperCase();
+        if (baseName.length() > 10) {
+            baseName = baseName.substring(0, 10);
+        }
+
+        tiFile.setFileName(baseName);
+        tiFile.setFileType("PROGRAM");
+        tiFile.setRecordLength(0);
+        tiFile.setContent(content);
+
+        FileImporter.importFile(image, tiFile);
+    }
+
+    private static void prepareFiad(Path absPath, List<Path> tempDsks) throws IOException {
+        if (isFiad(absPath)) {
+            Path dsk = createDskFromFiad(absPath);
+            tempDsks.add(dsk);
+        }
+    }
+
+    private static boolean isFiad(Path absPath) {
+        return absPath != null && Files.isDirectory(absPath);
+    }
 
     /**
      * Launches the emulator using the DTO configuration.
@@ -339,7 +435,21 @@ public class EmulatorStart {
         String mame_Executable = dto.mame_Executable;
         String mame_Parameter = emulatorOptionsConcatenate(dto);
 
+        // Liste der erzeugten .dsk-Dateien (für späteres Löschen)
+        List<Path> tempDsks = new ArrayList<>();
+
         try {
+            // ---------------------------------------------------------
+            // 1) FIAD → DSK erzeugen (aber DTO NICHT ändern!)
+            // ---------------------------------------------------------
+            prepareFiad(dto.fddPathP1, tempDsks);
+            prepareFiad(dto.fddPathP2, tempDsks);
+            prepareFiad(dto.fddPathP3, tempDsks);
+            prepareFiad(dto.fddPathP4, tempDsks);
+
+            // ---------------------------------------------------------
+            // 2) MAME starten
+            // ---------------------------------------------------------
             String fullExecutablePath = mame_WorkingPath + File.separator + mame_Executable;
 
             List<String> command = new ArrayList<>();
@@ -357,15 +467,28 @@ public class EmulatorStart {
             process.waitFor();
 
         } catch (IOException ex) {
-            log.error("Programm kann nicht gestartet werden!");
-            ex.printStackTrace();
+            log.error("Programm kann nicht gestartet werden!", ex);
             result = false;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            e.printStackTrace();
+            log.error("Emulator wurde unterbrochen", e);
+
+        } finally {
+            // ---------------------------------------------------------
+            // 3) Aufräumen: erzeugte .dsk löschen
+            // ---------------------------------------------------------
+            for (Path p : tempDsks) {
+                try {
+                    Files.deleteIfExists(p);
+                    log.trace("Temp .dsk gelöscht: {}", p);
+                } catch (IOException ex) {
+                    log.warn("Konnte temp .dsk nicht löschen: {}", p);
+                }
+            }
         }
 
         return result;
     }
+
 }
