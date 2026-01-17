@@ -7,18 +7,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.miriki.ti99.imagetools.domain.DiskFormat;
-import com.miriki.ti99.imagetools.domain.DiskFormatPreset;
-import com.miriki.ti99.imagetools.domain.Ti99File;
-import com.miriki.ti99.imagetools.domain.Ti99Image;
-import com.miriki.ti99.imagetools.domain.io.ImageFormatter;
-import com.miriki.ti99.imagetools.fs.FileImporter;
 import com.miriki.ti99.mame.dto.EmulatorOptionsDTO;
+import com.miriki.ti99.mame.fiad.FiadService;
 import com.miriki.ti99.mame.ui.UiConstants;
 
 /**
@@ -358,71 +352,11 @@ public class EmulatorStart {
     // Process execution
     // -------------------------------------------------------------------------
 
-    private static Path createDskFromFiad(Path fiadDir) throws IOException {
-
-        // Ziel: <fiadDir>.dsk
-        Path dskPath = fiadDir.resolveSibling(fiadDir.getFileName().toString() + ".dsk");
-
-        // 1. Diskettenformat wählen (erstmal DSDD – später konfigurierbar)
-        DiskFormatPreset preset = DiskFormatPreset.TI_DSDD;
-        DiskFormat format = preset.getFormat();
-
-        // 2. Neues Image erzeugen
-        Ti99Image image = new Ti99Image(format);
-        ImageFormatter.initialize(image);
-
-        // 3. Alle Dateien im FIAD-Ordner importieren
-        try (Stream<Path> stream = Files.list(fiadDir)) {
-            stream
-                .filter(Files::isRegularFile)
-                .forEach(file -> {
-                    try {
-                        importAsProgram(image, file);
-                    } catch (Exception ex) {
-                        log.warn("Konnte Datei nicht importieren: {}", file, ex);
-                    }
-                });
-        }
-
-        // 4. Image speichern
-        Files.write(dskPath, image.getRawData());
-
-        log.trace("FIAD → DSK erzeugt: {}", dskPath);
-        return dskPath;
-    }
-
-    private static void importAsProgram(Ti99Image image, Path hostFile) throws Exception {
-
-        byte[] content = Files.readAllBytes(hostFile);
-
-        Ti99File tiFile = new Ti99File();
-
-        // TI-Dateiname: maximal 10 Zeichen, keine Punkte
-        String baseName = hostFile.getFileName().toString();
-        baseName = baseName.replaceAll("\\..*$", ""); // Extension entfernen
-        baseName = baseName.toUpperCase();
-        if (baseName.length() > 10) {
-            baseName = baseName.substring(0, 10);
-        }
-
-        tiFile.setFileName(baseName);
-        tiFile.setFileType("PROGRAM");
-        tiFile.setRecordLength(0);
-        tiFile.setContent(content);
-
-        FileImporter.importFile(image, tiFile);
-    }
-
-    private static void prepareFiad(Path absPath, List<Path> tempDsks) throws IOException {
-        if (isFiad(absPath)) {
-            Path dsk = createDskFromFiad(absPath);
-            tempDsks.add(dsk);
-        }
-    }
-
+    /*
     private static boolean isFiad(Path absPath) {
         return absPath != null && Files.isDirectory(absPath);
     }
+    */
 
     /**
      * Launches the emulator using the DTO configuration.
@@ -442,10 +376,15 @@ public class EmulatorStart {
             // ---------------------------------------------------------
             // 1) FIAD → DSK erzeugen (aber DTO NICHT ändern!)
             // ---------------------------------------------------------
-            prepareFiad(dto.fddPathP1, tempDsks);
-            prepareFiad(dto.fddPathP2, tempDsks);
-            prepareFiad(dto.fddPathP3, tempDsks);
-            prepareFiad(dto.fddPathP4, tempDsks);
+            FiadService fiad = new FiadService();
+            // prepareFiad(dto.fddPathP1, tempDsks);
+            fiad.prepareFiad(dto.fddPathP1, tempDsks);
+            // prepareFiad(dto.fddPathP2, tempDsks);
+            fiad.prepareFiad(dto.fddPathP2, tempDsks);
+            // prepareFiad(dto.fddPathP3, tempDsks);
+            fiad.prepareFiad(dto.fddPathP3, tempDsks);
+            // prepareFiad(dto.fddPathP4, tempDsks);
+            fiad.prepareFiad(dto.fddPathP4, tempDsks);
 
             // ---------------------------------------------------------
             // 2) MAME starten

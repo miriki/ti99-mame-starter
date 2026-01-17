@@ -34,13 +34,13 @@ public class HelpMenuBuilder {
                 """
                 MAME TI99 Starter
 
-                v0.99.51 (public beta)
+                v0.99.67 (public beta)
 
                 (c) 2025 by
 
                 Michael 'miriki' Rittweger
 
-                [ Silvester Edition ]
+                [ Benjamin Franklin Edition ]
                 """,
                 I18n.t("menu.help.about"),
                 JOptionPane.INFORMATION_MESSAGE
