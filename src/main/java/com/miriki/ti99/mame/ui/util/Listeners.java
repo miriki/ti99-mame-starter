@@ -13,15 +13,16 @@ import javax.swing.event.DocumentListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.miriki.ti99.dskimg.domain.DiskFormat;
+import com.miriki.ti99.dskimg.domain.DiskFormatPreset;
+import com.miriki.ti99.dskimg.domain.Ti99File;
+import com.miriki.ti99.dskimg.domain.Ti99Image;
+import com.miriki.ti99.dskimg.domain.enums.FileType;
+import com.miriki.ti99.dskimg.domain.io.ImageFormatter;
+import com.miriki.ti99.dskimg.fs.FileImporter;
 import com.miriki.ti99.mame.persistence.SettingsPathRegistry;
 import com.miriki.ti99.mame.persistence.SettingsUsageRegistry;
 import com.miriki.ti99.mame.ui.MainAppFrame;
-import com.miriki.ti99.imagetools.domain.DiskFormat;
-import com.miriki.ti99.imagetools.domain.DiskFormatPreset;
-import com.miriki.ti99.imagetools.domain.Ti99File;
-import com.miriki.ti99.imagetools.domain.Ti99Image;
-import com.miriki.ti99.imagetools.domain.io.ImageFormatter;
-import com.miriki.ti99.imagetools.fs.FileImporter;
 import com.miriki.ti99.mame.tools.EmulatorStart;
 import com.miriki.ti99.mame.tools.FileTools;
 
@@ -218,7 +219,7 @@ public final class Listeners {
 
                 Ti99File tiFile = new Ti99File();
                 tiFile.setFileName(tiName);
-                tiFile.setFileType("PROGRAM");
+                tiFile.setType(FileType.PGM);
                 tiFile.setRecordLength(0);
                 tiFile.setContent(content);
 

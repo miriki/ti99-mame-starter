@@ -11,8 +11,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.miriki.ti99.dskimg.fiad.service.FiadService;
 import com.miriki.ti99.mame.dto.EmulatorOptionsDTO;
-import com.miriki.ti99.mame.fiad.FiadService;
 import com.miriki.ti99.mame.ui.UiConstants;
 
 /**
