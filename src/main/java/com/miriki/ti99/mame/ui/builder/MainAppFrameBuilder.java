@@ -25,7 +25,8 @@ public class MainAppFrameBuilder {
     public MainAppFrameBuilder(MainAppFrame frame, MainAppFrameComponents ui) {
         this.frame = frame;
         this.ui = ui;
-        this.factory = new UiFactory(frame, ui);
+        // this.factory = new UiFactory(frame, ui);
+        this.factory = new UiFactory(ui);
     }
 
     /**

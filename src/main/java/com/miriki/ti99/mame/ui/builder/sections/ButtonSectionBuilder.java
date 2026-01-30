@@ -47,19 +47,5 @@ public class ButtonSectionBuilder {
         ui.btnStartEmulator.addMouseListener(Listeners.startEmulatorClick(frame));
         ui.btnStartEmulator.putClientProperty("i18n", "button.startemulator");
 
-        // ---------------------------------------------------------------------
-        // Test FIAD Button
-        // ---------------------------------------------------------------------
-
-        /*
-        if (DEV) {
-	        parent.add(ui.btnTestFiad);
-	        ui.btnTestFiad.setName("btnTestFiad");
-	        ui.btnTestFiad.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 14));
-	        ui.btnTestFiad.setBounds(616, 240, 464 + 88, 32);
-	        ui.btnTestFiad.addMouseListener(Listeners.testFiadCreate());
-	        ui.btnTestFiad.putClientProperty("i18n", "button.testfiad");
-        }
-        */
     }
 }

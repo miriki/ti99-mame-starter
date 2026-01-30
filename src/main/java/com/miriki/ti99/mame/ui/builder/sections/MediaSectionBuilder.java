@@ -63,7 +63,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.flop2"),
-                24
+                48
         );
 
         ui.cbxFlop3 = factory.createComboBoxWithLabel(
@@ -74,7 +74,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.flop3"),
-                24
+                48
         );
 
         ui.cbxFlop4 = factory.createComboBoxWithLabel(
@@ -88,7 +88,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.flop4"),
-                24
+                48
         );
 
         // Harddisk 1–3
@@ -111,7 +111,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.hard2"),
-                24
+                48
         );
 
         ui.cbxHard3 = factory.createComboBoxWithLabel(
@@ -125,7 +125,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.hard3"),
-                24
+                48
         );
 
         // Cassette 1–2
@@ -151,7 +151,7 @@ public class MediaSectionBuilder {
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.cass2"),
-                24
+                48
         );
     }
 }

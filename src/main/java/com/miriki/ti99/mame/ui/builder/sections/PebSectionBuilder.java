@@ -506,7 +506,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus1 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus1",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 48, 256, 22,
+                82, 44, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 1", 64
@@ -515,7 +515,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus2 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus2",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 84, 256, 22,
+                82, 76, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 2", 64
@@ -524,7 +524,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus3 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus3",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 120, 256, 22,
+                82, 108, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 3", 64
@@ -533,7 +533,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus4 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus4",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 156, 256, 22,
+                82, 140, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 4", 64
@@ -542,7 +542,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus5 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus5",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 192, 256, 22,
+                82, 172, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 5", 64
@@ -551,7 +551,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus6 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus6",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 228, 256, 22,
+                82, 204, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 6", 64
@@ -560,7 +560,7 @@ public class PebSectionBuilder {
         ui.cbxScsibus7 = factory.createComboBoxWithLabel(
                 ui.Panel_PEB_WhtScsi, "cbxScsibus7",
                 new DefaultComboBoxModel<>(ui.SCSI_DEVICE_NAMES),
-                82, 264, 256, 22,
+                82, 236, 256, 22,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 "SCSI 7", 64

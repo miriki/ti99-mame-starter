@@ -14,7 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import com.miriki.ti99.mame.ui.MainAppFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.miriki.ti99.mame.ui.MainAppFrameComponents;
 import com.miriki.ti99.mame.ui.util.Listeners;
 
@@ -24,11 +26,18 @@ import com.miriki.ti99.mame.ui.util.Listeners;
 public class UiFactory {
 
     @SuppressWarnings("unused")
-    private final MainAppFrame frame;
+    private static final Logger log = LoggerFactory.getLogger(UiFactory.class);
+    // private final MainAppFrame frame;
     private final MainAppFrameComponents ui;
 
+    /*
     public UiFactory(MainAppFrame frame, MainAppFrameComponents ui) {
         this.frame = frame;
+        this.ui = ui;
+    }
+    */
+
+    public UiFactory(MainAppFrameComponents ui) {
         this.ui = ui;
     }
 
@@ -58,6 +67,12 @@ public class UiFactory {
                               int x, int y, int w, int h,
                               JComponent forComponent) {
 
+    	/*
+    	if ( "Slot #1".equals(text)) { 
+    		log.trace( "Label - text='{}'", text );
+    	}
+    	*/
+    	
         JLabel lbl = new JLabel(text);
         lbl.setFont(new Font("Arial", Font.PLAIN, 14));
         lbl.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -168,6 +183,12 @@ public class UiFactory {
                                                      String labelText,
                                                      int labelWidth) {
 
+    	/*
+    	if ( "Slot #1".equals(labelText) ) { 
+    		log.trace( "ComboBox Label - text='{}'", labelText ); 
+    	}
+    	*/
+    	
         JComboBox<String> box = createComboBox(parent, name, model, x, y, w, h, selectedIndex, listener);
 
         String labelName = "lbl" + name.substring(3);
