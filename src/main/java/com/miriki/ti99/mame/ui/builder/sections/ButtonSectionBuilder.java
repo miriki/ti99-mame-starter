@@ -47,5 +47,12 @@ public class ButtonSectionBuilder {
         ui.btnStartEmulator.addMouseListener(Listeners.startEmulatorClick(frame));
         ui.btnStartEmulator.putClientProperty("i18n", "button.startemulator");
 
+        parent.add(ui.btnFlop1Info);
+        ui.btnFlop1Info.setName("btnFlop1Info");
+        ui.btnFlop1Info.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 14));
+        ui.btnFlop1Info.setBounds(112 + 216 - 26 + 2, 176, 24, 24);
+        ui.btnFlop1Info.addMouseListener(Listeners.btnFlop1InfoClick(frame, 1));
+        ui.btnFlop1Info.putClientProperty("i18n", "button.flop1info");
+
     }
 }

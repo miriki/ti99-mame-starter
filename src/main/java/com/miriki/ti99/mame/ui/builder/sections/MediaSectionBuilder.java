@@ -38,7 +38,7 @@ public class MediaSectionBuilder {
                 parent,
                 "cbxCartridge",
                 new DefaultComboBoxModel<>(ui.CARTRIDGE_NAMES),
-                512, 80, 144, 22,
+                512, 80, 144, 24,
                 0,
                 e -> frame.collectEmulatorOptions()
         );
@@ -48,7 +48,7 @@ public class MediaSectionBuilder {
                 parent,
                 "cbxFlop1",
                 new DefaultComboBoxModel<>(ui.FLOPPYDISKIMAGE_NAMES),
-                112, 176, 216, 24,
+                112, 176, 216 - 26, 24,
                 0,
                 e -> frame.collectEmulatorOptions(),
                 I18n.t("main.flop1"),

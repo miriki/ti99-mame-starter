@@ -302,7 +302,8 @@ public class MainAppFrameComponents {
     public JTextArea dbgEmulatorOptions;
 
     public JButton btnStartEmulator;
-    public JButton btnTestFiad;
+    // public JButton btnTestFiad;
+    public JButton btnFlop1Info;
 
     // --------------------------------------------------
     // Sidebar / tabs
@@ -528,7 +529,8 @@ public class MainAppFrameComponents {
 
         dbgEmulatorOptions = new JTextArea();
         btnStartEmulator = new JButton("start");
-        btnTestFiad = new JButton("test fiad");
+        // btnTestFiad = new JButton("test fiad");
+        btnFlop1Info = new JButton("?");
 
         tabSideportDevices = new JTabbedPane(JTabbedPane.TOP);
 

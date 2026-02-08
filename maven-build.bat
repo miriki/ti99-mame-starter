@@ -1,4 +1,5 @@
 @echo off
+setlocal ENABLEEXTENSIONS
 chcp 65001 >nul
 setlocal ENABLEDELAYEDEXPANSION
 
@@ -20,22 +21,27 @@ set COLOR_RESET=%ESC%[0m
 ::  KONFIGURATION
 :: ============================================================================
 
-set SRCLIB1DIR=C:\Users\mritt\eclipse-workspace\TI99-DskImg-Lib
+set SRCLIB1DIR=C:\Users\mritt\eclipse-workspace\TI99-BlockDev-Lib
 set REP1VER=1.0.0
-set REPLIB1DIR=C:\Users\mritt\.m2\repository\com\miriki\ti99\dskimg\%REP1VER%
-set REPLIB1BAS=ti99-dskimg-lib-%REP1VER%
+set REPLIB1DIR=C:\Users\mritt\.m2\repository\com\miriki\ti99\ti99-blockdev-lib\%REP1VER%
+set REPLIB1BAS=ti99-blockdev-lib-%REP1VER%
 
-set SRCLIB2DIR=C:\Users\mritt\eclipse-workspace\TI99-FIAD-Lib
+set SRCLIB2DIR=C:\Users\mritt\eclipse-workspace\TI99-DskImg-Lib
 set REP2VER=1.0.0
-set REPLIB2DIR=C:\Users\mritt\.m2\repository\com\miriki\ti99\fiad\%REP2VER%
-set REPLIB2BAS=ti99-fiad-lib-%REP2VER%
+set REPLIB2DIR=C:\Users\mritt\.m2\repository\com\miriki\ti99\ti99-dskimg-lib\%REP2VER%
+set REPLIB2BAS=ti99-dskimg-lib-%REP2VER%
+
+set SRCLIB3DIR=C:\Users\mritt\eclipse-workspace\TI99-FIAD-Lib
+set REP3VER=1.0.0
+set REPLIB3DIR=C:\Users\mritt\.m2\repository\com\miriki\ti99\ti99-fiad-lib\%REP3VER%
+set REPLIB3BAS=ti99-fiad-lib-%REP3VER%
 
 set SRCAPP1DIR=C:\Users\mritt\eclipse-workspace\TI99-MAME-Starter
 set APP1VER=1.0.0
 set TRGAPP1DIR=%SRCAPP1DIR%\target
 set TRGAPP1BAS=ti99-mame-starter-%APP1VER%
 
-set RELAPP1DIR=C:\Users\mritt\eclipse-workspace\releases\TI99-MAME-Starter
+set RELAPP1DIR=C:\Users\mritt\eclipse-workspace\releases\ti99-mame-starter
 set RELAPP1BAS=TI99-MAME-Starter
 
 :: ============================================================================
@@ -66,6 +72,17 @@ if %errorlevel% neq 0 (
     rmdir "%REP2VER%" /s /q 2>nul
 )
 
+cd /d "%REPLIB3DIR%" 2>nul
+if %errorlevel% neq 0 (
+    echo %COLOR_WARN%Repo-Verzeichnis existiert nicht – wird übersprungen.%COLOR_RESET%
+) else (
+    echo %COLOR_INFO%Lösche alte Repo-Dateien...%COLOR_RESET%
+    del "%REPLIB3BAS%.*" 2>nul
+    del "_remote.repositories" 2>nul
+    cd ..
+    rmdir "%REP3VER%" /s /q 2>nul
+)
+
 echo %COLOR_OK%Repo-Bereinigung abgeschlossen.%COLOR_RESET%
 
 :: ============================================================================
@@ -86,11 +103,19 @@ cd /d "%SRCLIB1DIR%"
 echo %COLOR_INFO%Starte Maven-Build der Library...%COLOR_RESET%
 call mvn clean install
 call :check_error "Library-Build fehlgeschlagen"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 cd /d "%SRCLIB2DIR%"
 echo %COLOR_INFO%Starte Maven-Build der Library...%COLOR_RESET%
 call mvn clean install
 call :check_error "Library-Build fehlgeschlagen"
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+cd /d "%SRCLIB3DIR%"
+echo %COLOR_INFO%Starte Maven-Build der Library...%COLOR_RESET%
+call mvn clean install
+call :check_error "Library-Build fehlgeschlagen"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo %COLOR_OK%Library erfolgreich installiert.%COLOR_RESET%
 
@@ -104,6 +129,7 @@ echo %COLOR_INFO%Prüfe Dependency-Tree...%COLOR_RESET%
 :: call mvn dependency:tree -Dincludes=com.miriki.ti99:fiad
 call mvn dependency:tree -Dincludes=com.miriki.ti99
 call :check_error "Dependency-Tree fehlgeschlagen"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo %COLOR_OK%Dependency-Check abgeschlossen.%COLOR_RESET%
 
@@ -115,6 +141,7 @@ cd /d "%SRCAPP1DIR%"
 echo %COLOR_INFO%Starte Maven-Build der Applikation...%COLOR_RESET%
 call mvn clean package
 call :check_error "Starter-Build fehlgeschlagen"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo %COLOR_OK%Starter erfolgreich gebaut.%COLOR_RESET%
 

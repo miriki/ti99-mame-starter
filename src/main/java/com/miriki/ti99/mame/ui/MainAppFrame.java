@@ -2,6 +2,7 @@ package com.miriki.ti99.mame.ui;
 
 import java.awt.EventQueue;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -33,6 +34,11 @@ public class MainAppFrame extends JFrame {
     // -------------------------------------------------------------------------
 
     private final MainAppFrameComponents ui;
+    /*
+    public MainAppFrameComponents getUi() {
+        return ui;
+    }
+    */
 
     // -------------------------------------------------------------------------
     // Central media lists (single source of truth)
@@ -204,6 +210,29 @@ public class MainAppFrame extends JFrame {
 
     public FloppyEntryList getFloppyList() {
         return floppyList;
+    }
+
+    public String getSelectedFloppyPath(int drive) {
+
+        JComboBox<String> cbx = switch (drive) {
+            case 1 -> ui.cbxFlop1;
+            case 2 -> ui.cbxFlop2;
+            case 3 -> ui.cbxFlop3;
+            case 4 -> ui.cbxFlop4;
+            default -> null;
+        };
+
+        if (cbx == null) return null;
+
+        String displayName = (String) cbx.getSelectedItem();
+        if (displayName == null || displayName.equals(UiConstants.CBX_SEL_NONE)) {
+            return null;
+        }
+
+        var entry = getFloppyList().findByDisplayName(displayName);
+        if (entry == null) return null;
+
+        return entry.getFullPath().toString();
     }
 
     public HarddiskEntryList getHarddiskList() {

@@ -2,7 +2,6 @@ package com.miriki.ti99.mame.ui.util;
 
 import java.awt.Window;
 import java.awt.event.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -13,16 +12,10 @@ import javax.swing.event.DocumentListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.miriki.ti99.dskimg.domain.DiskFormat;
-import com.miriki.ti99.dskimg.domain.DiskFormatPreset;
-import com.miriki.ti99.dskimg.domain.Ti99File;
-import com.miriki.ti99.dskimg.domain.Ti99Image;
-import com.miriki.ti99.dskimg.domain.enums.FileType;
-import com.miriki.ti99.dskimg.domain.io.ImageFormatter;
-import com.miriki.ti99.dskimg.fs.FileImporter;
 import com.miriki.ti99.mame.persistence.SettingsPathRegistry;
 import com.miriki.ti99.mame.persistence.SettingsUsageRegistry;
 import com.miriki.ti99.mame.ui.MainAppFrame;
+import com.miriki.ti99.mame.ui.dialogs.diskinfo.DiskInfoFrame;
 import com.miriki.ti99.mame.tools.EmulatorStart;
 import com.miriki.ti99.mame.tools.FileTools;
 
@@ -31,7 +24,8 @@ import com.miriki.ti99.mame.tools.FileTools;
  */
 public final class Listeners {
 
-    private static final Logger log = LoggerFactory.getLogger(Listeners.class);
+    @SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger(Listeners.class);
 
     private Listeners() {}
 
@@ -177,23 +171,21 @@ public final class Listeners {
     /**
      * Debug helper for FIAD testing.
      */
+    /*
     public static MouseAdapter testFiadCreate() {
 
         return new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-
                 try {
-
                     Path targetDir = Path.of("C:/Users/mritt/AppData/Roaming/TI99MAME/ti99_fiad/chess");
                     Path imagePath = targetDir.resolve("chess.dsk");
 
-                    DiskFormatPreset preset = DiskFormatPreset.TI_DSDD;
-                    DiskFormat format = preset.getFormat();
-                    Ti99Image image = new Ti99Image(format);
-                    ImageFormatter.initialize(image);
+                    // 1. Image erzeugen (High-Level)
+                    Ti99Image image = Ti99Image.createEmpty(DiskFormatPreset.TI_DSDD);
 
+                    // 2. Dateien importieren
                     importSvg(image, targetDir, "br.svg", "BR");
                     importSvg(image, targetDir, "bp.svg", "BP");
                     importSvg(image, targetDir, "wq.svg", "WQ");
@@ -203,7 +195,8 @@ public final class Listeners {
                     targetDir = Path.of("C:/Users/mritt/AppData/Roaming/TI99MAME/ti99_fiad/ti99xdt");
                     importSvg(image, targetDir, "xbas99.py", "XBAS");
 
-                    Files.write(imagePath, image.getRawData());
+                    // 3. Speichern
+                    Files.write(imagePath, image.toBytes());
 
                     log.info("Import abgeschlossen: {}", imagePath);
 
@@ -224,6 +217,20 @@ public final class Listeners {
                 tiFile.setContent(content);
 
                 FileImporter.importFile(image, tiFile);
+            }
+        };
+    }
+    */
+
+    public static MouseAdapter btnFlop1InfoClick(MainAppFrame frame, int drive) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                String fullPath = frame.getSelectedFloppyPath(drive);
+                if (fullPath == null) return;
+
+                new DiskInfoFrame(frame, fullPath).setVisible(true);
             }
         };
     }

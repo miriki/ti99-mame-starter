@@ -99,7 +99,7 @@
 		
 		<dependency>
 		    <groupId>com.miriki.ti99</groupId>
-		    <artifactId>TI99-FIAD-Lib</artifactId>
+		    <artifactId>ti99-fiad-lib</artifactId>
 		    <version>1.0.0</version>
 		</dependency>
 		
